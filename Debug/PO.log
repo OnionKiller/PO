@@ -1,0 +1,4 @@
+﻿  PO.cpp
+d:\prog\pbcopt\po\po\po.cpp(165): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+PO.obj : error LNK2019: unresolved external symbol "class std::list<struct xy,class std::allocator<struct xy> > __cdecl createRoute(class std::list<struct xy,class std::allocator<struct xy> >,class ListMatrix *)" (?createRoute@@YA?AV?$list@Uxy@@V?$allocator@Uxy@@@std@@@std@@V12@PAVListMatrix@@@Z) referenced in function _main
+D:\prog\PBCopt\PO\Debug\PO.exe : fatal error LNK1120: 1 unresolved externals
