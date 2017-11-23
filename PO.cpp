@@ -100,7 +100,7 @@ list<xy> createRoute(list<xy> startend,ListMatrix *tabou)
 	list<xy> tmplist;
 	ListMatrix *localtabou = new ListMatrix(255, 255);
 	localtabou->set(start.x, start.y, 1);
-	bool alternative = false;
+	double alternative = 0;
 
 	while (true)
 	{
@@ -113,7 +113,6 @@ list<xy> createRoute(list<xy> startend,ListMatrix *tabou)
 		//up
 		t.x = local.x;
 		t.y = local.y + 1;
-		
 		if (tabou->get(t.x, t.y) == 0 && (t.x >= 0) && (t.y >= 0)) {
 			if (t.x == end.x&&t.y == end.y) { tmplist.push_back(t); break; }
 			//if in conn, also tabou
@@ -145,7 +144,7 @@ list<xy> createRoute(list<xy> startend,ListMatrix *tabou)
 		}
 		//sumup
 		//I know, kill me for this
-		options.sort([end](const xy &A, const xy &B) {return h(A, end) > h(B, end); });
+		options.sort([end](const xy &A, const xy &B) {return h(A, end) < h(B, end); });
 		//options ascending in h
 		auto opIt = options.begin();
 		while (opIt!=options.end())
@@ -154,13 +153,33 @@ list<xy> createRoute(list<xy> startend,ListMatrix *tabou)
 			{
 				if (localtabou->get(opIt->x, opIt->y) == 0)
 				{
-					//ok, és optimális
-					//eredeti hely tabu
-					localtabou->set(local.x, local.y, 1);
-					//új hely berak
-					local = *opIt;
-					ok = true;
-					break;
+					if (ok) 
+					{ 
+						alternative = h(*opIt, end); 
+					}
+					else
+					{
+						//ok, és optimális
+						//eredeti hely tabu
+						localtabou->set(local.x, local.y, 1);
+						//új hely berak
+						local = *opIt;
+						ok = true;
+						alternative = 0;
+					}
+				}
+				else
+				{
+					if (h(local, end) == alternative)
+					{
+						//go back
+						localtabou->set(local.x, local.y, 1);
+						//tmplist.pop_back();
+						tmplist.pop_back();
+						auto tit = tmplist.end();
+						local = *(--tmplist.end());
+						break;
+					}
 				}
 			}
 			opIt++;
@@ -172,11 +191,20 @@ list<xy> createRoute(list<xy> startend,ListMatrix *tabou)
 			{
 				if (localtabou->get(opIt->x, opIt->y) == 0)
 				{
-						//ok, nem optimális
+					if (ok)
+					{
+						alternative = h(*opIt, end);
+					}
+					else
+					{
+						//ok, és optimális
+						//eredeti hely tabu
 						localtabou->set(local.x, local.y, 1);
+						//új hely berak
 						local = *opIt;
 						ok = true;
-						alternative = false;
+						alternative = 0;
+					}
 				}
 				opIt++;
 			}
@@ -197,7 +225,3 @@ float h(xy s, xy goal)
 {
 	return sqrt(pow((goal.x - s.x),2) + pow((goal.y - s.y),2));
 };
-list<xy> options(xy local)
-{
-
-}
